@@ -13,7 +13,8 @@ router.use(function (req, res, next) {
 	});
 	req.on('end', function () {
 		bodyString = bodyString || '{}';
-		req.body = eval('(' + bodyString + ')');
+		if (bodyString.match(/</gi)) return;
+		req.body = JSON.parse(bodyString);
 		next();
 	});
 });
