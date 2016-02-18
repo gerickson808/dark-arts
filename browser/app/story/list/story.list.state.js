@@ -8,10 +8,10 @@ app.config(function ($stateProvider) {
 		resolve: {
 			stories: function (Story) {
 				return Story.fetchAll();
-			},
-			users: function (User) {
-				return User.fetchAll();
 			}
+			// users: function (User) {
+			// 	return User.fetchAll();
+			// }
 		}
 	});
 });

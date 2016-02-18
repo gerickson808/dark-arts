@@ -23,6 +23,14 @@ router.get('/', function (req, res, next) {
 	})
 	.then(null, next);
 });
+router.get('/:id', function (req, res, next) {
+	req.story.populateAsync('author')
+	.then(function (story) {
+		res.json(story);
+	})
+	.then(null, next);
+});
+
 
 router.post('/', function (req, res, next) {
 	Story.create(req.body)
@@ -35,12 +43,9 @@ router.post('/', function (req, res, next) {
 	.then(null, next);
 });
 
-router.get('/:id', function (req, res, next) {
-	req.story.populateAsync('author')
-	.then(function (story) {
-		res.json(story);
-	})
-	.then(null, next);
+router.use('/', function(req, res, next){
+	if(req.user.isAdmin === false) res.status(403).send("Verboten");
+	next();
 });
 
 router.put('/:id', function (req, res, next) {
@@ -53,7 +58,7 @@ router.put('/:id', function (req, res, next) {
 });
 
 router.delete('/:id', function (req, res, next) {
-	req.story.remove()
+	if(req.user.isAdmin || req.user._id === req.story.author) req.story.remove()
 	.then(function () {
 		res.status(204).end();
 	})

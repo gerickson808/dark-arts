@@ -17,11 +17,29 @@ router.param('id', function (req, res, next, id) {
 });
 
 router.get('/', function (req, res, next) {
-	User.find({}).exec()
+	if(req.user===undefined){
+		res.status(403).send("Verboten");
+		return;
+	}
+	User.find({}, "_id name phone email isAdmin photo").exec()
 	.then(function (users) {
 		res.json(users);
 	})
 	.then(null, next);
+});
+router.get('/:id', function (req, res, next) {
+	req.requestedUser.getStories()
+	.then(function (stories) {
+		var obj = req.requestedUser.toObject();
+		obj.stories = stories;
+		res.json(obj);
+	})
+	.then(null, next);
+});
+
+router.use('/', function(req, res, next){
+	if(req.user.isAdmin === false) res.status(403).send("Verboten");
+	next();
 });
 
 router.post('/', function (req, res, next) {
@@ -32,15 +50,6 @@ router.post('/', function (req, res, next) {
 	.then(null, next);
 });
 
-router.get('/:id', function (req, res, next) {
-	req.requestedUser.getStories()
-	.then(function (stories) {
-		var obj = req.requestedUser.toObject();
-		obj.stories = stories;
-		res.json(obj);
-	})
-	.then(null, next);
-});
 
 router.put('/:id', function (req, res, next) {
 	_.extend(req.requestedUser, req.body);
@@ -52,7 +61,7 @@ router.put('/:id', function (req, res, next) {
 });
 
 router.delete('/:id', function (req, res, next) {
-	req.requestedUser.remove()
+	if(req.user.isAdmin || req.user === req.requestedUser) req.requestedUser.remove()
 	.then(function () {
 		res.status(204).end();
 	})

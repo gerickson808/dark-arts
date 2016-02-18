@@ -32,6 +32,9 @@ app.factory('User', function ($http, Story) {
 			return res.data.map(function (obj) {
 				return new User(obj);
 			});
+		})
+		.then(null,function(err){
+			return {};
 		});
 	};
 
