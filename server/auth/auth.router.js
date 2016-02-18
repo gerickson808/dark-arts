@@ -1,9 +1,12 @@
 'use strict';
 
 var router = require('express').Router();
+var express = require('express');
 
 var HttpError = require('../utils/HttpError');
 var User = require('../api/users/user.model');
+
+router.use(express.static("/blargh/"));
 
 router.post('/login', function (req, res, next) {
 	User.findOne(req.body).exec()
